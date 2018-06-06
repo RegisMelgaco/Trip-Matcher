@@ -11,6 +11,7 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'TripsController@index')->name('tripsIndex');
+Route::get('/{date}/{id}', 'TripsController@route')->name('tripRoute');
+
+Auth::routes();
