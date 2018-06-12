@@ -34,5 +34,15 @@ return [
         'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
     ],
+    
+    'bynd' => [
+        'base_url' => 'https://test.bynd.com.br',
+        'username' => env('BYND_USERNAME'),
+        'password' => env('BYND_PASSWORD'),
+    ],
+
+    'trips_caculator' => [
+        'max_distance' => 0.5 // quilometros
+    ]
 
 ];

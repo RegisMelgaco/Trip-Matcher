@@ -1,17 +1,11 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+/** @var \Illuminate\Routing\Router $router */
 
-Route::get('/', 'TripsController@index')->name('tripsIndex');
-Route::get('/{date}/{id}', 'TripsController@route')->name('tripRoute');
+use Carbon\Carbon;
+
+$router->get('trips', 'TripsController@index')->name('trips');
+$router->get('trip/{consult_date}/{id}', 'TripsController@show')->name('trip');
+$router->get('/', 'TripsController@indexToday')->name('tripsToday');
 
 Auth::routes();

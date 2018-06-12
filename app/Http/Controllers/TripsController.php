@@ -2,55 +2,52 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\IIntentionService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Services\ApiBynd;
-use App\Services\MapCalculator;
+use App\Services\TripCalculator;
 
 class TripsController extends Controller
 {
+    /**
+     * @var IIntentionService
+     */
+    private $intentions;
 
-	public function __construct()
+    public function __construct(IIntentionService $intentions)
 	{
 		$this->middleware('auth');
-	}
+        $this->intentions = $intentions;
+    }
+
+    public function indexToday(){
+        $consult_date = Carbon::today()->toDateString();
+
+        return redirect()->route('trips', ['consult_date'=>$consult_date]);
+    }
 
 	public function index(Request $request)
 	{
-		$date = $request->input('dataConsulta');
+        $consult_date = $request->input('consult_date');
+        if (!empty($consult_date)){
+        	$consult_date = Carbon::createFromFormat('Y-m-d', $consult_date);
+        }
+        else $consult_date = Carbon::today();
 
-		if ($date) {
-			$apibynd = new ApiBynd();
-			$trips = $apibynd->accessDate($date);
+        $trips = $this->intentions->getIntentions($consult_date);
 
-			return view('trips_index')->with('trips', $trips);
-		} else {
-			return view('trips_index')->with('trips', False);
-		}
+        return view('trips.index', compact('trips', 'consult_date'));
 	}
 
-	public function route($date, $id)
+	public function show($consult_date, $id)
 	{
-		$maxDistance = 0.5;
-		$trips = ApiBynd::accessDate($date);
-		$trip = $trips[$id];
+        $consult_date = Carbon::createFromFormat('Y-m-d', $consult_date);
 
-		$compatibleTrips = [];
+		$trip = $this->intentions->getIntentions($consult_date)[$id];
 
-		for ($i=0; $i < count($trips); $i++) { 
-			if ($i == $id) {
-				continue;
-			} else {
-				if ($trip['mode'] != $trips[$i]['mode']) {
-					$startsDistance =  MapCalculator::cooordinatesDistance($trip['start_address']['location'], $trips[$i]['start_address']['location']);
-					$endDistance = MapCalculator::cooordinatesDistance($trip['end_address']['location'], $trips[$i]['end_address']['location']);
+		$trips = $this->intentions->getIntentionsCompatibleWith($trip, false);
 
-					if ($startsDistance <= $maxDistance && $endDistance <= $maxDistance) {
-						$compatibleTrips += $trips[$i];
-					}
-				}
-			}
-		}
-
-		return $compatibleTrips;
+		return $trips;
+		//return view('trips.show', compact('trips'));
 	}
 }

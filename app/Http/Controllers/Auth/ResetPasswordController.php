@@ -25,7 +25,7 @@ class ResetPasswordController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = route('tripsIndex');
+    protected $redirectTo = 'Trips';
 
     /**
      * Create a new controller instance.
