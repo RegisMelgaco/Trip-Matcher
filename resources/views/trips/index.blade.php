@@ -17,8 +17,10 @@
 	</form>
 
 
-	<div class="row mh-100">
-		<div id="map" class="col col-md-8 rounded mh-100"></div>
+	<div class="row">
+		<div class="col col-md-8">
+			<div id="map" class="rounded mh-100em sticky-top sticky-top-mt-5"></div>
+		</div>
 		<div class="col col-sm-10 col-md-4">
 		  	@for ($i = 0; $i < count($trips); $i++)
 		    	@if($trips[$i]['mode'] == 1)

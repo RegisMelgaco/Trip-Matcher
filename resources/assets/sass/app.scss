@@ -16,3 +16,16 @@
 #map {
 	min-height: 25vw;
 }
+
+.sticky-top-mt-5 {
+  top: 2em !important;
+}
+
+.mh-100em {
+  max-height: 30em;
+}
+
+.sticky-top {
+  position: -webkit-sticky !important;
+  position: sticky !important;
+}

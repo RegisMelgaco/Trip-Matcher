@@ -56,15 +56,15 @@ class ByndService implements IIntentionService
         $anterior_trips = [];
         $trips = [];
         while ($schedule->diffInDays($end_schedule) > 0){
+            if (!empty($trips)){
+                $new_compatible_trips = TripCalculator::getCompatibleIntetionsFrom($trips, $trip);
+                $compatible_trips = array_merge($compatible_trips, $new_compatible_trips);
+            }
             while ($anterior_trips == $trips) {
                 $schedule->addDay();
                 $trips = $this->getIntentions($schedule);
             }
             $anterior_trips = $trips;
-            if (!empty($trips)){
-                $new_compatible_trips = TripCalculator::getCompatibleIntetionsFrom($trips, $trip);
-                $compatible_trips = array_merge($compatible_trips, $new_compatible_trips);
-            }
         }
 
         return $compatible_trips;

@@ -14,7 +14,8 @@ class TripCalculator
     static function getCompatibleIntetionsFrom($trips, $trip, $with_equals_mode=false)
     {
         $max_distance = config('services.trips_caculator.max_distance');
-        for ($i = 0; $i < count($trips); $i++){
+        $len = count($trips);
+        for ($i = 0; $i < $len; $i++){
 
             $start_distance = TripCalculator::cooordinatesDistance($trip['start_address']['location'], $trips[$i]['start_address']['location']);
             if ($start_distance > $max_distance) {
@@ -28,7 +29,7 @@ class TripCalculator
                 continue;
             }
 
-            if ($trip['mode'] == $trips[$i]['mode'] && false) {
+            if ($trip['mode'] == $trips[$i]['mode'] && !$with_equals_mode) {
                 unset($trips[$i]);
                 continue;
             }

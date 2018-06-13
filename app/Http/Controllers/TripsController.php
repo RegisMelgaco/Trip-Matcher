@@ -47,7 +47,7 @@ class TripsController extends Controller
 
 		$trips = $this->intentions->getIntentionsCompatibleWith($trip, false);
 
-		return $trips;
-		//return view('trips.show', compact('trips'));
+		//return $trips;
+		return view('trips.show', compact('trips', 'trip'));
 	}
 }
