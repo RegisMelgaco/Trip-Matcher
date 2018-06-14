@@ -3,51 +3,44 @@
 namespace App\Http\Controllers;
 
 use App\Services\IIntentionService;
+use App\Services\TripMatcher;
+use App\Trip;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Services\TripCalculator;
 
 class TripsController extends Controller
 {
     /**
      * @var IIntentionService
      */
-    private $intentions;
+    private $service;
 
-    public function __construct(IIntentionService $intentions)
-	{
-		$this->middleware('auth');
-        $this->intentions = $intentions;
+    private $matcher;
+
+    public function __construct(IIntentionService $service)
+    {
+        $this->middleware('auth');
+        $this->service = $service;
+        $this->matcher = new TripMatcher(0.002);
     }
 
-    public function indexToday(){
-        $consult_date = Carbon::today()->toDateString();
-
-        return redirect()->route('trips', ['consult_date'=>$consult_date]);
-    }
-
-	public function index(Request $request)
-	{
+    public function index(Request $request)
+    {
         $consult_date = $request->input('consult_date');
-        if (!empty($consult_date)){
-        	$consult_date = Carbon::createFromFormat('Y-m-d', $consult_date);
-        }
-        else $consult_date = Carbon::today();
+        if (!empty($consult_date))
+            $consult_date = Carbon::createFromFormat('Y-m-d', $consult_date);
+        else
+            $consult_date = Carbon::today();
 
-        $trips = $this->intentions->getIntentions($consult_date);
+        $trips = $this->service->getIntentions($consult_date);
 
-        return view('trips.index', compact('trips', 'consult_date'));
-	}
+        return view('trips.index', compact('consult_date', 'trips'));
+    }
 
-	public function show($consult_date, $id)
-	{
-        $consult_date = Carbon::createFromFormat('Y-m-d', $consult_date);
+    public function show(Trip $trip)
+    {
+        $trips = $this->matcher->getMatchedTrips($trip);
 
-		$trip = $this->intentions->getIntentions($consult_date)[$id];
-
-		$trips = $this->intentions->getIntentionsCompatibleWith($trip, false);
-
-		//return $trips;
 		return view('trips.show', compact('trips', 'trip'));
 	}
 }

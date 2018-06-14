@@ -2,13 +2,11 @@
 
 namespace App\Services;
 
+use App\Trip;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-
-use App\Services\IIntentionService;
-
-use App\Services\TripCalculator;
+use Illuminate\Support\Collection;
 
 class ByndService implements IIntentionService
 {
@@ -16,6 +14,9 @@ class ByndService implements IIntentionService
 
     /**
      * ApiBynd constructor.
+     * @param $baseUrl
+     * @param $username
+     * @param $password
      */
     public function __construct($baseUrl, $username, $password)
     {
@@ -29,44 +30,51 @@ class ByndService implements IIntentionService
      * Get all trips from specified date
      *
      * @param Carbon $date
-     * @return array
+     * @return Collection
      */
-	public function getIntentions(Carbon $date)
+	public function getIntentions(Carbon $date): Collection
 	{
+        $data = $this->requestIntentions($date);
+        $intentions = new Collection();
+
+        foreach ($data as $item) {
+            $trip = $this->buildTrip($item);
+            $trip->save();
+            $intentions->push($trip);
+        }
+
+        return $intentions;
+    }
+
+    /**
+     * @param Carbon $date
+     * @return mixed|\Psr\Http\Message\ResponseInterface|string
+     */
+    public function requestIntentions(Carbon $date)
+    {
         try {
-            $res = $this->client->request('GET', '/api/v2/concierge/intentions?search_date='.$date->toDateString());
-            return json_decode($res->getBody(), true)['data'];
+            $response = $this->client->request('GET', '/api/v2/concierge/intentions?search_date=' . $date->toDateString());
+            return json_decode($response->getBody()->getContents(), true)['data'];
         } catch (GuzzleException $e) {
             return [];
         }
-	}
+    }
 
     /**
-     * Get all trips campatible with $trip
-     *
-     * @param array $trip:
-     * @return array
+     * @param $item
+     * @return Trip
      */
-    public function getIntentionsCompatibleWith($trip, $with_equals_mode=true)
+    private function buildTrip(array $item): Trip
     {
-        $schedule = Carbon::createFromFormat('Y-m-d H:i:s', $trip['schedule']);
-        $end_schedule = Carbon::createFromFormat('Y-m-d H:i:s', $trip['end_schedule']);
+        $item['start_address_lat'] = $item['start_address']['location']['lat'];
+        $item['start_address_lng'] = $item['start_address']['location']['lng'];
+        $item['end_address_lat'] = $item['end_address']['location']['lat'];
+        $item['end_address_lng'] = $item['end_address']['location']['lng'];
+        $item['user_name'] = $item['user']['name'];
 
-        $compatible_trips = [];
-        $anterior_trips = [];
-        $trips = [];
-        while ($schedule->diffInDays($end_schedule) > 0){
-            if (!empty($trips)){
-                $new_compatible_trips = TripCalculator::getCompatibleIntetionsFrom($trips, $trip);
-                $compatible_trips = array_merge($compatible_trips, $new_compatible_trips);
-            }
-            while ($anterior_trips == $trips) {
-                $schedule->addDay();
-                $trips = $this->getIntentions($schedule);
-            }
-            $anterior_trips = $trips;
-        }
+        $item['start_address'] = $item['start_address']['address'];
+        $item['end_address'] = $item['end_address']['address'];
 
-        return $compatible_trips;
+        return new Trip($item);
     }
 }

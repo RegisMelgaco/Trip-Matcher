@@ -9,6 +9,7 @@
 namespace App\Services;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 interface IIntentionService
 {
@@ -16,15 +17,7 @@ interface IIntentionService
      * Get all trips from specified date
      *
      * @param Carbon $date
-     * @return array
+     * @return Collection
      */
-    public function getIntentions(Carbon $date);
-
-    /**
-     * Get all trips from specified date
-     *
-     * @param Carbon $date
-     * @return array
-     */
-    public function getIntentionsCompatibleWith($trip);
+    public function getIntentions(Carbon $date): Collection;
 }
