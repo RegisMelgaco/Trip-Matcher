@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use App\Services\ByndService;
 use App\Services\IIntentionService;
-use App\Services\TripCalculator;
+use App\Services\Coord;
 use App\Services\TripMatcher;
 use App\Trip;
 use Illuminate\Support\ServiceProvider;

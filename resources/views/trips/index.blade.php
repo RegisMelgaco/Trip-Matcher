@@ -27,7 +27,7 @@
                 @endif
 
                 @foreach ($trips as $trip)
-                    <div class="card mb-3 border-primary bg-primary">
+                        <div class="card mb-3 border-primary bg-primary">
                         <div class="card-header bg-primary">
                             <div class="row">
                                 <div class="col-sm-10">

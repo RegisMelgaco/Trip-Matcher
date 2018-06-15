@@ -19,17 +19,17 @@ window.initMap = function () {
 function loadTrips(trips) {
     let locations = [];
     for (let i = trips.length - 1; i >= 0; i--) {
-        locations[i * 2] = [trips[i]['end_address_lat'], trips[i]['end_address_lng']];
-        locations[i * 2 + 1] = [trips[i]['start_address_lat'], trips[i]['start_address_lng']];
+        locations[i * 2] = {lat: trips[i]['end_address_lat'], lng: trips[i]['end_address_lng']};
+        locations[i * 2 + 1] = {lat: trips[i]['start_address_lat'], lng: trips[i]['start_address_lng']};
     }
 
-    let markers = trips.map(function (location) {
+    let markers = locations.map(function (location) {
         return new google.maps.Marker({
             position: location,
             map: window.mainMap
         });
     });
 
-    new MarkerClusterer(map, markers,
+    new MarkerClusterer(window.mainMap, markers,
         {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
 };

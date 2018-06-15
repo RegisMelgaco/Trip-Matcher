@@ -25,21 +25,20 @@ class ByndService implements IIntentionService
             'auth' => [$username, $password]
         ]);
     }
-    
+
     /**
      * Get all trips from specified date
      *
      * @param Carbon $date
      * @return Collection
      */
-	public function getIntentions(Carbon $date): Collection
-	{
+    public function getIntentions(Carbon $date): Collection
+    {
         $data = $this->requestIntentions($date);
         $intentions = new Collection();
 
         foreach ($data as $item) {
             $trip = $this->buildTrip($item);
-            $trip->save();
             $intentions->push($trip);
         }
 
@@ -48,16 +47,13 @@ class ByndService implements IIntentionService
 
     /**
      * @param Carbon $date
-     * @return mixed|\Psr\Http\Message\ResponseInterface|string
+     * @return array
+     * @throws GuzzleException
      */
     public function requestIntentions(Carbon $date)
     {
-        try {
-            $response = $this->client->request('GET', '/api/v2/concierge/intentions?search_date=' . $date->toDateString());
-            return json_decode($response->getBody()->getContents(), true)['data'];
-        } catch (GuzzleException $e) {
-            return [];
-        }
+        $response = $this->client->request('GET', '/api/v2/concierge/intentions?search_date=' . $date->toDateString());
+        return json_decode($response->getBody()->getContents(), true)['data'];
     }
 
     /**
@@ -75,6 +71,14 @@ class ByndService implements IIntentionService
         $item['start_address'] = $item['start_address']['address'];
         $item['end_address'] = $item['end_address']['address'];
 
-        return new Trip($item);
+        $trip = Trip::find($item['id']);
+        if (!$trip) {
+            $trip = new Trip();
+            $trip->id = $item['id'];
+        }
+
+        $trip->fill($item);
+        $trip->save();
+        return $trip;
     }
 }

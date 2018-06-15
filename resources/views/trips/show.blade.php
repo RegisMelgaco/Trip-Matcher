@@ -28,24 +28,24 @@
                     </h2>
                 @endif
 
-                @foreach ($trips as $trip)
+                @foreach ($trips as $match)
                     <div class="card mb-3 border-primary">
                         <div class="card-header">
                             <div class="row">
                                 <div class="col-sm-10">
-                                    <h5>@lang("trip.{$trip->mode_name}"): {{ $trip->user_name }}</h5>
+                                    <h5>@lang("trip.{$match->mode_name}"): {{ $match->user_name }}</h5>
                                 </div>
                             </div>
                         </div>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item">
-                                Origem: {{ $trip->start_address }}
+                                Origem: {{ $match->start_address }} ({{ $match->distanceToStart($trip->start_location) }} m)
                             </li>
                             <li class="list-group-item">
-                                Destino: {{ $trip->end_address }}
+                                Destino: {{ $match->end_address }}  ({{ $match->distanceToEnd($trip->end_location) }} m)
                             </li>
                             <li class="list-group-item">
-                                Horário: {{ $trip->schedule->format('H:i') }} - {{ $trip->end_time }}
+                                Horário: {{ $match->schedule->format('H:i') }} - {{ $match->end_time }}
                             </li>
                         </ul>
                     </div>

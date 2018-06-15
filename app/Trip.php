@@ -4,6 +4,8 @@ namespace App;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Location\Coordinate;
+use Location\Distance\Vincenty;
 
 /**
  * @property Carbon schedule
@@ -12,6 +14,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property double start_address_lng
  * @property double end_address_lat
  * @property double end_address_lng
+ * @property int id
+ * @property Coordinate start_location
+ * @property Coordinate end_location
  */
 class Trip extends Model
 {
@@ -55,6 +60,26 @@ class Trip extends Model
     public function getModeNameAttribute()
     {
         return $this->isDriver() ? 'driver' : 'rider';
+    }
+
+    public function getStartLocationAttribute()
+    {
+        return new Coordinate($this->start_address_lat, $this->start_address_lat);
+    }
+
+    public function getEndLocationAttribute()
+    {
+        return new Coordinate($this->end_address_lat, $this->end_address_lat);
+    }
+
+    public function distanceToStart(Coordinate $coordinate)
+    {
+        return $this->start_location->getDistance($coordinate, new Vincenty());
+    }
+
+    public function distanceToEnd(Coordinate $coordinate)
+    {
+        return $this->end_location->getDistance($coordinate, new Vincenty());
     }
 
 }

@@ -15,8 +15,8 @@ class CreateTripsTable extends Migration
     {
         Schema::create('trips', function (Blueprint $table) {
             $table->increments('id');
-            $table->dateTime('schedule');
-            $table->boolean('mode');
+            $table->dateTime('schedule')->index();
+            $table->boolean('mode')->index();
             $table->integer('spaces')->nullable();
             $table->time('end_time');
             $table->string('start_address');

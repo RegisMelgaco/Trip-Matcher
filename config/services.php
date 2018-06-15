@@ -36,7 +36,7 @@ return [
     ],
     
     'bynd' => [
-        'base_url' => 'https://test.bynd.com.br',
+        'base_url' => 'https://app.bynd.com.br',
         'username' => env('BYND_USERNAME'),
         'password' => env('BYND_PASSWORD'),
     ],
